@@ -1,0 +1,195 @@
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  padding: 24px 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #08111f;
+  color: #f3f7ff;
+  font-family: Arial, sans-serif;
+}
+
+.app {
+  width: 100%;
+  max-width: 480px;
+  padding: 24px;
+  border: 1px solid #273b53;
+  border-radius: 24px;
+  background: #111e30;
+  box-shadow: 0 20px 60px #0006;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo, .orb {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2dd4bf, #477bff);
+  color: #071523;
+  font-weight: bold;
+}
+
+.logo {
+  width: 46px;
+  height: 46px;
+  font-size: 25px;
+}
+
+h1, h2, p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 4px;
+  font-size: 21px;
+}
+
+header p, footer, .hint {
+  color: #a9b9cf;
+  font-size: 13px;
+}
+
+header p {
+  margin-bottom: 0;
+}
+
+.status {
+  margin-left: auto;
+  color: #5eead4;
+  font-size: 12px;
+}
+
+.welcome {
+  text-align: center;
+  padding: 28px 0 20px;
+}
+
+.orb {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 18px;
+  font-size: 35px;
+  box-shadow: 0 0 35px #2dd4bf44;
+}
+
+.welcome h2 {
+  font-size: 23px;
+  margin-bottom: 8px;
+}
+
+.welcome p {
+  color: #a9b9cf;
+  font-size: 14px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+select, input {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #344760;
+  border-radius: 10px;
+  background: #0b1727;
+  color: white;
+  font-size: 15px;
+}
+
+.chat {
+  height: 190px;
+  overflow-y: auto;
+  margin: 18px 0 10px;
+  padding: 12px;
+  border: 1px solid #263a52;
+  border-radius: 14px;
+  background: #0b1727;
+}
+
+.message {
+  width: fit-content;
+  max-width: 90%;
+  margin-bottom: 10px;
+  padding: 11px 13px;
+  border-radius: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.bot {
+  background: #20334a;
+}
+
+.user {
+  margin-left: auto;
+  background: #155e75;
+}
+
+.hint {
+  min-height: 16px;
+}
+
+form {
+  display: flex;
+  gap: 8px;
+}
+
+form input {
+  min-width: 0;
+}
+
+button {
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid #5eead4;
+  outline-offset: 3px;
+}
+
+.send {
+  background: #2dd4bf;
+  color: #08111f;
+}
+
+.mic, .stop {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.mic {
+  background: linear-gradient(90deg, #2dd4bf, #60a5fa);
+  color: #08111f;
+}
+
+.stop {
+  background: #25374d;
+  color: white;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+footer {
+  margin-top: 22px;
+  text-align: center;
+}

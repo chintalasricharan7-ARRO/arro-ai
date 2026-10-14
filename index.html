@@ -1,0 +1,55 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARRO AI Assistant</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="logo">A</div>
+      <div>
+        <h1>ARRO AI</h1>
+        <p>Your multilingual voice assistant</p>
+      </div>
+      <span class="status">● Online</span>
+    </header>
+
+    <section class="welcome">
+      <div class="orb">✦</div>
+      <h2>Hello! I'm ARRO.</h2>
+      <p>Talk to me in Telugu, Hindi or English.</p>
+    </section>
+
+    <label for="language">Choose your language</label>
+    <select id="language">
+      <option value="en-IN">English</option>
+      <option value="te-IN">తెలుగు (Telugu)</option>
+      <option value="hi-IN">हिन्दी (Hindi)</option>
+    </select>
+
+    <section id="chat" class="chat" aria-live="polite">
+      <div class="message bot">
+        Hello! How can I help you today?
+      </div>
+    </section>
+
+    <p id="status" class="hint">Type a message or tap the microphone.</p>
+
+    <form id="chatForm">
+      <input id="message" placeholder="Type your message..." autocomplete="off">
+      <button type="submit" class="send">Send</button>
+    </form>
+
+    <button id="micButton" class="mic">🎙 Start speaking</button>
+    <button id="stopButton" class="stop">Stop speaking</button>
+
+    <footer>ARRO AI · Built for everyone</footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
