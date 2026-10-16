@@ -7,17 +7,31 @@ const micButton = document.getElementById("micButton");
 const stopButton = document.getElementById("stopButton");
 const statusText = document.getElementById("status");
 
+const BACKEND_URL =
+  "https://arro-ai-backend.chintalasricharan7.workers.dev";
+
 const SpeechRecognition =
   window.SpeechRecognition || window.webkitSpeechRecognition;
 
 let recognition = null;
 let listening = false;
+let sending = false;
 
 const greetings = {
   "en-IN": "Hello! I am ARRO. How can I help you today?",
   "te-IN": "నమస్కారం! నేను ARRO. మీకు ఎలా సహాయం చేయగలను?",
-  "hi-IN": "नमस्ते! मैं ARRO हूँ। मैं आपकी क्या मदद कर सकता हूँ?"
+  "hi-IN": "नमस्ते! मैं ARRO हूँ। मैं आपकी क्या मदद कर सकता हूँ।"
 };
+
+function getLanguageName() {
+  const languages = {
+    "en-IN": "English",
+    "te-IN": "Telugu",
+    "hi-IN": "Hindi"
+  };
+
+  return languages[languageSelect.value] || "English";
+}
 
 function addMessage(text, type) {
   const message = document.createElement("div");
@@ -36,15 +50,14 @@ function speak(text) {
   window.speechSynthesis.cancel();
 
   const utterance = new SpeechSynthesisUtterance(text);
-  const lang = languageSelect.value;
-
-  utterance.lang = lang;
+  utterance.lang = languageSelect.value;
   utterance.rate = 0.95;
   utterance.pitch = 1;
 
   const voices = window.speechSynthesis.getVoices();
-  const matchingVoice = voices.find(voice =>
-    voice.lang.toLowerCase() === lang.toLowerCase()
+  const matchingVoice = voices.find(
+    voice => voice.lang.toLowerCase() ===
+      languageSelect.value.toLowerCase()
   );
 
   if (matchingVoice) {
@@ -67,74 +80,63 @@ function speak(text) {
   window.speechSynthesis.speak(utterance);
 }
 
-function getReply(message, lang) {
-  const text = message.toLowerCase();
-
-  if (lang === "te-IN") {
-    if (/నమస్కార|హలో|హాయ్/.test(text)) {
-      return "నమస్కారం! నేను ARRO. మీకు ఎలా సహాయం చేయగలను?";
-    }
-    if (/పేరు/.test(text)) {
-      return "నా పేరు ARRO. నేను మీ వాయిస్ అసిస్టెంట్‌ని.";
-    }
-    if (/ధన్యవాద/.test(text)) {
-      return "మీకు స్వాగతం! ఇంకా ఏదైనా సహాయం కావాలా?";
-    }
-    if (/సమయ|టైమ్/.test(text)) {
-      return "మీకు సమయం తెలుసుకోవాలంటే మీ పరికరంలోని గడియారాన్ని చూడండి.";
-    }
-    return "మీ ప్రశ్న అర్థమైంది. దయచేసి మరిన్ని వివరాలు చెప్పగలరా?";
-  }
-
-  if (lang === "hi-IN") {
-    if (/नमस्ते|हेलो|हाय/.test(text)) {
-      return "नमस्ते! मैं ARRO हूँ। मैं आपकी क्या मदद कर सकता हूँ?";
-    }
-    if (/नाम/.test(text)) {
-      return "मेरा नाम ARRO है। मैं आपका वॉइस असिस्टेंट हूँ।";
-    }
-    if (/धन्यवाद|शुक्रिया/.test(text)) {
-      return "आपका स्वागत है! क्या मैं और कुछ मदद कर सकता हूँ?";
-    }
-    if (/समय|टाइम/.test(text)) {
-      return "समय जानने के लिए कृपया अपने डिवाइस की घड़ी देखें।";
-    }
-    return "मैं आपकी बात समझने की कोशिश कर रहा हूँ। कृपया थोड़ा और बताइए।";
-  }
-
-  if (/\b(hello|hi|hey|namaste)\b/.test(text)) {
-    return "Hello! I am ARRO. How can I help you today?";
-  }
-  if (text.includes("your name") || text.includes("who are you")) {
-    return "I am ARRO, your multilingual voice assistant.";
-  }
-  if (text.includes("thank")) {
-    return "You're welcome! Is there anything else I can help you with?";
-  }
-  if (text.includes("hotel")) {
-    return "I can help answer hotel enquiries. Please provide the hotel's details and FAQs to configure me for that business.";
-  }
-  if (text.includes("price") || text.includes("cost")) {
-    return "Please tell me which product or service you are asking about.";
-  }
-  if (text.includes("bye")) {
-    return "Goodbye! Thank you for talking with ARRO.";
-  }
-
-  return "I heard you say: " + message +
-    ". I am currently a basic prototype. Connect an AI engine to answer more questions naturally.";
-}
-
-function sendMessage(message) {
+async function sendMessage(message) {
   const cleanMessage = message.trim();
-  if (!cleanMessage) return;
+
+  if (!cleanMessage || sending) return;
 
   addMessage(cleanMessage, "user");
   input.value = "";
+  sending = true;
+  form.querySelector('button[type="submit"]')?.setAttribute("disabled", "");
 
-  const reply = getReply(cleanMessage, languageSelect.value);
-  addMessage(reply, "bot");
-  speak(reply);
+  statusText.textContent = "ARRO is thinking...";
+
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: cleanMessage,
+        language: getLanguageName()
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "The AI service returned an error.");
+    }
+
+    if (!data.answer) {
+      throw new Error("ARRO received an empty answer.");
+    }
+
+    addMessage(data.answer, "bot");
+    speak(data.answer);
+
+  } catch (error) {
+    console.error("ARRO error:", error);
+
+    let errorMessage =
+      "Sorry, I could not connect to ARRO's AI service. Please try again.";
+
+    if (error instanceof TypeError) {
+      errorMessage =
+        "Could not connect to the server. Check your internet connection and try again.";
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+
+    addMessage(errorMessage, "bot");
+    statusText.textContent = "Connection problem. Please try again.";
+
+  } finally {
+    sending = false;
+    form.querySelector('button[type="submit"]')?.removeAttribute("disabled");
+  }
 }
 
 form.addEventListener("submit", event => {
@@ -147,7 +149,7 @@ languageSelect.addEventListener("change", () => {
     recognition.stop();
   }
 
-  statusText.textContent = "Language changed.";
+  statusText.textContent = "Language changed to " + getLanguageName() + ".";
 });
 
 micButton.addEventListener("click", () => {
@@ -181,12 +183,13 @@ micButton.addEventListener("click", () => {
   recognition.onerror = event => {
     statusText.textContent =
       "Microphone error: " + event.error +
-      ". Check microphone permission and language support.";
+      ". Check microphone permission and your microphone device.";
   };
 
   recognition.onend = () => {
     listening = false;
     micButton.textContent = "🎙 Start speaking";
+
     if (statusText.textContent === "Listening... Speak now.") {
       statusText.textContent = "Ready to talk.";
     }
@@ -211,7 +214,8 @@ stopButton.addEventListener("click", () => {
   statusText.textContent = "Speech stopped.";
 });
 
-window.speechSynthesis?.getVoices();
+if ("speechSynthesis" in window) {
+  window.speechSynthesis.getVoices();
+}
 
-addMessage(greetings["en-IN"], "bot");
-s
+addMessage(greetings[languageSelect.value] || greetings["en-IN"], "bot");
